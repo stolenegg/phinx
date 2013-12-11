@@ -78,13 +78,20 @@ class Manager
     public function printStatus($environment)
     {
         $output = $this->getOutput();
+        $env    = $this->getEnvironment($environment);
+
+        // output environment config (mask password)
+        $config = $env->getOptions();
+        if (isset($config['pass'])) {
+            $config['pass'] = preg_replace('/./', '*', $config['pass']);
+        }
+        $output->writeln('Environment config: '.var_export($config,true));
         
         if (count($this->getMigrations())) {
             $output->writeln('');
             $output->writeln(' Status  Migration ID    Migration Name ');
             $output->writeln('-----------------------------------------');
         
-            $env = $this->getEnvironment($environment);
             $versions = $env->getVersions();
         
             foreach ($this->getMigrations() as $migration) {
